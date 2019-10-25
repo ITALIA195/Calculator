@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
@@ -14,7 +14,7 @@ namespace Calculator
         private const int KeypadRows = 5;
         
         private readonly RectangleF[] _buttons = new RectangleF[KeypadRows * KeypadColumns];
-        private readonly string[] _buttonsText = 
+        private readonly string[] _buttonsText = new string[KeypadRows * KeypadColumns]
         {
             "CE", "C", "DEL", "/",
             "7", "8", "9", "x",
@@ -22,7 +22,7 @@ namespace Calculator
             "1", "2", "3", "+",
             "\xB1", "0", "", "="
         };
-        private readonly object[] _keyMapping =
+        private readonly object[] _keyMapping = new object[KeypadRows * KeypadColumns]
         {
             Action.ClearEntry, Action.Clear, Action.Delete, Operator.Division,
             7, 8, 9, Operator.Moltiplication,
