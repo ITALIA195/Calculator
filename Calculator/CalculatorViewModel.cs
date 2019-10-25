@@ -12,6 +12,9 @@ namespace Calculator
         private bool _resetNext;
         private double _display;
 
+        /// <summary>
+        /// The display of the calculator
+        /// </summary>
         public double Display
         {
             get => _display;
@@ -23,6 +26,9 @@ namespace Calculator
             }
         }
 
+        /// <summary>
+        /// The current operand of the expression
+        /// </summary>
         private double CurrentOperand
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -31,12 +37,16 @@ namespace Calculator
             set => _operands[_operator == Operator.None ? 0 : 1] = value;
         }
 
+        /// <summary>
+        /// Event called when a key is pressed on the calculator
+        /// </summary>
+        /// <param name="key">The key pressed</param>
         public void OnKeyPressed(object key)
         {
             switch (key)
             {
+                // The key was a number
                 case int num:
-                {
                     if (_resetNext)
                     {
                         CurrentOperand = 0;
@@ -47,7 +57,8 @@ namespace Calculator
                     CurrentOperand = CurrentOperand * 10 + (CurrentOperand < 0 ? -num : num);
                     _display = CurrentOperand;
                     break;
-                }
+                
+                // The key was an operator
                 case Operator op:
                     if (_operator != Operator.None)
                         _operands[0] = Compute(_operator, _operands);
@@ -57,6 +68,8 @@ namespace Calculator
                     _display = _operands[0];
                     _resetNext = true;
                     break;
+                
+                // The key was an action
                 case Action action:
                     switch (action)
                     {
@@ -91,13 +104,17 @@ namespace Calculator
                         case Action.PlusMinus:
                             _display = CurrentOperand = -CurrentOperand;
                             break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(action), "Unexpected requested action");
                     }
                     break;
             }
         }
 
+        /// <summary>
+        /// Solves the expression and returns the result
+        /// </summary>
+        /// <param name="op">The operation to solve</param>
+        /// <param name="operands">The operands of the operation</param>
+        /// <returns>The result of the operation</returns>
         private static double Compute(Operator op, params double[] operands)
         {
             return op switch
@@ -110,6 +127,7 @@ namespace Calculator
             };
         }
 
+        // INotifyPropertyChanged implementation
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

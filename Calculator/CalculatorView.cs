@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
@@ -50,6 +50,7 @@ namespace Calculator
             SetStyle(ControlStyles.DoubleBuffer, true);
         }
 
+        /// <summary>Draws the text area to the top of the calculator</summary>
         private void DrawTextArea(Graphics g)
         {
             float width = ClientSize.Width;
@@ -65,6 +66,7 @@ namespace Calculator
                 new RectangleF(width - size.Width, height / 2f - size.Height / 2f, ClientSize.Width, height));
         }
 
+        /// <summary>Draws the clickable keys on the calculator</summary>
         private void DrawKeypadArea(Graphics g)
         {
             var font = new Font(Font.FontFamily, 12, FontStyle.Regular);
@@ -87,12 +89,14 @@ namespace Calculator
             }
         }
         
+        /// <summary>Draws the window</summary>
         protected override void OnPaint(PaintEventArgs e)
         {
             DrawTextArea(e.Graphics);
             DrawKeypadArea(e.Graphics);
         }
 
+        /// <summary>Handles the pressing of the buttons</summary>
         protected override void OnMouseDown(MouseEventArgs e)
         {
             if (_selectedButton < 0)
@@ -107,6 +111,7 @@ namespace Calculator
             }
         }
 
+        /// <summary>Allows for resizable application with scalable buttons</summary>
         protected override void OnResize(EventArgs e)
         {
             const float startX = 0;
@@ -134,6 +139,7 @@ namespace Calculator
             Invalidate();
         }
 
+        /// <summary>Gets the button the cursor is hovering</summary>
         protected override void OnMouseMove(MouseEventArgs e)
         {
             var previousSelected = _selectedButton;
