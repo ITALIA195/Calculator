@@ -52,23 +52,17 @@ namespace Calculator
 
         private void DrawTextArea(Graphics g)
         {
+            float width = ClientSize.Width;
             float height = ClientSize.Height * TextAreaHeightRatio;
 
-            string str;
-            if (_viewModel.Display < 0)
-                str = (-_viewModel.Display).ToString(CultureInfo.InvariantCulture) + '-';
-            else
-                str = _viewModel.Display.ToString(CultureInfo.InvariantCulture);
+            var str = _viewModel.Display.ToString(CultureInfo.InvariantCulture);
             var font = new Font(Font.FontFamily, 26, FontStyle.Regular);
             var size = g.MeasureString(str, font);
             g.DrawString(
                 str,
                 font,
                 _whiteBrush,
-                new RectangleF(0, height / 2f - size.Height / 2f, ClientSize.Width, height),
-                new StringFormat(StringFormatFlags.DirectionRightToLeft |
-                                 StringFormatFlags.NoWrap |
-                                 StringFormatFlags.FitBlackBox));
+                new RectangleF(width - size.Width, height / 2f - size.Height / 2f, ClientSize.Width, height));
         }
 
         private void DrawKeypadArea(Graphics g)
