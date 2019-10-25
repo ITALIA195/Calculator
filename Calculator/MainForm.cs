@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 
 namespace Calculator
@@ -10,6 +11,7 @@ namespace Calculator
             SetupForm();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetupForm()
         {    
             Size = new Size(300, 400);

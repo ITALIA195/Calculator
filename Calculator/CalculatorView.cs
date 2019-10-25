@@ -22,23 +22,31 @@ namespace Calculator
             "1", "2", "3", "+",
             "\xB1", "0", "", "="
         };
+        private readonly object[] _keyMapping =
+        {
+            Action.ClearEntry, Action.Clear, Action.Delete, Operator.Division,
+            7, 8, 9, Operator.Moltiplication,
+            4, 5, 6, Operator.Subtraction,
+            1, 2, 3, Operator.Sum,
+            Action.PlusMinus, 0, null, Action.Compute
+        };
         
-        private double _displayedNumber;
         private int _selectedButton = -1;
 
-        private bool _resetNext;
-        
-        private double _firstOperand;
-        private double _secondOperand;
-        private Operator _operator;
+        private readonly CalculatorViewModel _viewModel;
         
         private readonly Brush _whiteBrush = new SolidBrush(Color.White);
         private readonly Brush _buttonNormal = new SolidBrush(Color.FromArgb(22, 22, 22));
         private readonly Brush _buttonHover = new SolidBrush(Color.FromArgb(80, 80, 80));
         private readonly Brush _buttonKeypad = new SolidBrush(Color.FromArgb(7, 7, 7));
 
-        public CalculatorView()
+        public CalculatorView() : this(new CalculatorViewModel()) { }
+
+        public CalculatorView(CalculatorViewModel viewModel)
         {
+            _viewModel = viewModel;
+
+            viewModel.PropertyChanged += (a, b) => Invalidate();
             SetStyle(ControlStyles.DoubleBuffer, true);
         }
 
@@ -47,10 +55,10 @@ namespace Calculator
             float height = ClientSize.Height * TextAreaHeightRatio;
 
             string str;
-            if (_displayedNumber < 0)
-                str = (-_displayedNumber).ToString(CultureInfo.InvariantCulture) + '-';
+            if (_viewModel.Display < 0)
+                str = (-_viewModel.Display).ToString(CultureInfo.InvariantCulture) + '-';
             else
-                str = _displayedNumber.ToString(CultureInfo.InvariantCulture);
+                str = _viewModel.Display.ToString(CultureInfo.InvariantCulture);
             var font = new Font(Font.FontFamily, 26, FontStyle.Regular);
             var size = g.MeasureString(str, font);
             g.DrawString(
@@ -98,85 +106,11 @@ namespace Calculator
             
             if ((e.Button & MouseButtons.Left) != 0)
             {
-                var row = _selectedButton / KeypadColumns;
-                var column = _selectedButton % KeypadColumns;
-                if (row >= 1 && row <= 3 && column < 3)
-                {
-                    if (_resetNext)
-                    {
-                        _displayedNumber = 0;
-                        _resetNext = false;
-                    }
-                    var num = (3 - row) * 3 + column;
-                    _displayedNumber = _displayedNumber * 10 + num + 1;
-                }
-
-                switch (column, row)
-                {
-                    case (0, 4):
-                        _displayedNumber = -_displayedNumber;
-                        break;
-                    case (0, 0):
-                        _displayedNumber = 0;
-                        break;
-                    case (1, 0):
-                        _displayedNumber = 0;
-                        _firstOperand = 0;
-                        _secondOperand = 0;
-                        _operator = Operator.None;
-                        _resetNext = false;
-                        break;
-                    case (2, 0):
-                        _displayedNumber = (_displayedNumber - _displayedNumber % 10) / 10;
-                        break;
-                    case (1, 4):
-                        if (_resetNext)
-                        {
-                            _displayedNumber = 0;
-                            _resetNext = false;
-                        }
-                        _displayedNumber *= 10;
-                        break;
-                }
-                
-                if (column == 3 && row < 4)
-                {
-                    if (_operator != Operator.None)
-                    {
-                        _secondOperand = _displayedNumber;
-                        ComputeOperation();
-                    }
-                    
-                    _operator = (Operator) row + 1;
-                    _firstOperand = _displayedNumber;
-                    _resetNext = true;
-                }
-
-                if (column == 3 && row == 4)
-                {
-                    if (_operator != Operator.None)
-                    {
-                        _secondOperand = _displayedNumber;
-                        ComputeOperation();
-                    }
-                }
+                var key = _keyMapping[_selectedButton];
+                _viewModel.OnKeyPressed(key);
                 
                 Invalidate();
             }
-        }
-
-        private void ComputeOperation()
-        {
-            _displayedNumber = _operator switch
-            {
-                Operator.Division => _firstOperand / _secondOperand,
-                Operator.Moltiplication => _firstOperand * _secondOperand,
-                Operator.Subtraction => _firstOperand - _secondOperand,
-                Operator.Sum => _firstOperand + _secondOperand,
-                _ => throw new ArgumentOutOfRangeException(nameof(_operator), "The current operator is not supported.")
-            };
-            _operator = Operator.None;
-            _resetNext = true;
         }
 
         protected override void OnResize(EventArgs e)
